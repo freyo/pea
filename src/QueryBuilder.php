@@ -71,7 +71,7 @@ class QueryBuilder extends Builder
         if ($this->isAwful()) {
             return $this->getAwful();
         } elseif ($this->isNormal()) {
-            return $this->getAwful();
+            return $this->getNormal();
         } else {
             return $this->getSimple();
         }
@@ -156,13 +156,15 @@ class QueryBuilder extends Builder
         $primaryKeyName = $this->model->primaryKey();
         // 查询主键列表
         $rows = $this->getAwful([$primaryKeyName]);
-        $ids = array_map(function ($row) use($primaryKeyName) {
+        $ids = $rows->filter(function ($row) use($primaryKeyName) {
+            return isset($row->$primaryKeyName);
+        })->map(function ($row) use($primaryKeyName) {
             return $row->$primaryKeyName;
-        }, $rows);
+        });
 
         // 没查到结果则直接返回空数组
-        if (!$ids) {
-            return [];
+        if (!$ids->all()) {
+            return $ids;
         }
 
         // 根据主键查询结果
@@ -219,7 +221,7 @@ class QueryBuilder extends Builder
         $missedIds = array_keys($cacheKeys);
         if (!$missedIds) {
             $this->fireEvent('hit.simple.1000');
-            return $cachedRows;
+            return collect($cachedRows);
         }
 
         if (count($cachedRows) === 0) {
@@ -261,7 +263,7 @@ class QueryBuilder extends Builder
             return $row !== [];
         });
 
-        return array_merge($cachedRows, $missedRows);
+        return collect(array_merge($cachedRows, $missedRows));
     }
 
     private function buildCacheKeys()
