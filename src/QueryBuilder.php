@@ -71,7 +71,7 @@ class QueryBuilder extends Builder
         if ($this->isAwful()) {
             return $this->getAwful();
         } elseif ($this->isNormal()) {
-            return $this->getNormal();
+            return $this->getAwful();
         } else {
             return $this->getSimple();
         }
@@ -118,7 +118,7 @@ class QueryBuilder extends Builder
     }
 
     /**
-     * 判断当前查询是否未「复杂查询」，判断标准
+     * 判断当前查询是否为「复杂查询」，判断标准
      * 1. 含有 max, sum 等汇聚函数
      * 2. 包含 distinct 指令
      * 3. 包含分组
