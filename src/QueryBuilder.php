@@ -163,7 +163,7 @@ class QueryBuilder extends Builder
         });
 
         // 没查到结果则直接返回空数组
-        if (!$ids->all()) {
+        if ($ids->isEmpty()) {
             return $ids;
         }
 
